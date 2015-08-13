@@ -50,4 +50,51 @@ function post_listing_shortcode( $atts ) {
     ob_end_flush();
 }
 
+
+add_shortcode( 'list-sites', 'sites_listing_shortcode' );
+
+function sites_listing_shortcode( $atts ) {
+
+
+    extract( shortcode_atts(  array(
+            'network_id' => 1,
+            'public'     => null,
+            'archived'   => null,
+            'mature'     => null,
+            'spam'       => null,
+            'deleted'    => null,
+            'limit'      => -1,
+            'offset'     => 0,
+        ), $atts ) );
+
+
+
+    $options = array(
+        'network_id' => $network_id,
+        'public' => $public,
+        'archived' => $archived,
+        'mature' => $mature,
+        'spam' => $spam,
+        'deleted' => $deleted,
+        'limit' => $limit,
+    );
+
+    $sites = wp_get_sites( $options );
+
+
+    ob_start();
+    if ( ! empty($sites) ) { ?>
+        <ul class="sites-listing"> <?
+            foreach($sites as $site) 
+             switch_to_blog( $site['blog_id'] ); ?>
+                <li id="site-<?php echo $site['blog_id']; ?>">
+                    <a href="<?php echo get_bloginfo('url'); ?>"><?php echo get_bloginfo('name'); ?></a>
+                </li><?
+             restore_current_blog();
+            endforeach; ?>
+        </ul> <?php 
+    }
+    ob_end_flush();
+}
+
 ?>
